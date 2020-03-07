@@ -16,11 +16,11 @@ export const createAlgoliaIndex = (
 ) => algoliasearch(appId, searchKey).initIndex(indexName);
 
 /** Current request state, hits retrieved, and loading status. */
-interface SearchState {
+interface SearchState<Hit> {
   /** Algolia SearchResponse object — contains only last page of hits retrieved */
-  response: SearchResponse<any> | null;
+  response: SearchResponse<Hit> | null;
   /** Contains all hits for search query, including all pages retrieved */
-  hits: SearchResponse<any>['hits'];
+  hits: SearchResponse<Hit>['hits'];
   /** Set when loading initially or loading more hits */
   loading: boolean;
   /** Flag set if there are more pages to be retrieved */
@@ -34,10 +34,10 @@ interface SearchState {
  * @param prevState See `SearchState` interface
  * @param updates Updates to `SearchState`
  */
-const searchReducer = (
-  prevState: SearchState,
-  updates: Partial<SearchState>
-) => {
+const generateSearchReducer = <Hit>() => (
+  prevState: SearchState<Hit>,
+  updates: Partial<SearchState<Hit>>
+): SearchState<Hit> => {
   const gotMore = updates?.response?.page && updates?.response?.page > 0;
 
   const hits =
@@ -69,19 +69,17 @@ const searchReducer = (
  *      https://www.algolia.com/doc/api-reference/search-api-parameters/, and
  *   3. `getMore` to get the next page of results
  */
-export function useAlgolia(
+export function useAlgolia<Hit = any>(
   appId: string,
   searchKey: string,
   indexName: string,
   initialRequest: RequestOptions & SearchOptions = {}
 ) {
   // Stores response status
-  const [searchState, searchDispatch] = useReducer(searchReducer, {
-    response: null,
-    hits: [],
-    loading: false,
-    hasMore: false,
-  });
+  const [searchState, searchDispatch] = useReducer(
+    generateSearchReducer<Hit>(),
+    { response: null, hits: [], loading: false, hasMore: false }
+  );
 
   // Store the `SearchOptions` request object that can shallow-merge updates
   const [request, requestDispatch] = useReducer(
@@ -107,7 +105,7 @@ export function useAlgolia(
       // If we’re not getting a new page, reset the hits
       else searchDispatch({ loading: true, hits: [] });
 
-      const response = await index.search<any>('', {
+      const response = await index.search<Hit>('', {
         page,
         ...request,
       });
