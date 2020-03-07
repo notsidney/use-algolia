@@ -1,167 +1,127 @@
-# TSDX React User Guide
+# useAlgolia [![npm latest release](https://badgen.net/npm/v/use-algolia)](https://www.npmjs.com/use-algolia) ![Minified size](https://badgen.net/bundlephobia/min/use-algolia)
 
-Congrats! You just saved yourself hours of work by bootstrapping this project with TSDX. Let’s get you oriented with what’s here and how to use it.
+Dead-simple React hook to make Algolia search queries. Supports pagination out
+of the box.
 
-> This TSDX setup is meant for developing React components (not apps!) that can be published to NPM. If you’re looking to build an app, you should use `create-react-app`, `razzle`, `nextjs`, `gatsby`, or `react-static`.
+## Installation
 
-> If you’re new to TypeScript and React, checkout [this handy cheatsheet](https://github.com/sw-yx/react-typescript-cheatsheet/)
+Requires [React](https://www.npmjs.com/react) >= 16.8.0 and
+[algoliasearch](https://www.npmjs.com/algoliasearch) 4.
 
-## Commands
-
-TSDX scaffolds your new library inside `/src`, and also sets up a [Parcel-based](https://parceljs.org) playground for it inside `/example`.
-
-The recommended workflow is to run TSDX in one terminal:
-
-```bash
-npm start # or yarn start
+```
+yarn add react algoliasearch use-algolia
 ```
 
-This builds to `/dist` and runs the project in watch mode so any edits you save inside `src` causes a rebuild to `/dist`.
+## Usage
 
-Then run the example inside another:
+Pass the Algolia app ID, search API key, and index name to the hook call.
 
-```bash
-cd example
-npm i # or yarn to install dependencies
-npm start # or yarn start
+Optionally, pass the initial request options as the fourth argument.  
+See https://www.algolia.com/doc/api-reference/search-api-parameters/ for all
+options.
+
+Access the returned hits, response, loading, and hasMore from `searchState`.
+
+```ts
+const [searchState, requestDispatch, getMore] = useAlgolia(
+  APP_ID,
+  SEARCH_KEY,
+  INDEX_NAME,
+  { query: 'something' }
+);
+
+const { hits, response, loading, hasMore } = searchState;
 ```
 
-The default example imports and live reloads whatever is in `/dist`, so if you are seeing an out of date component, make sure TSDX is running in watch mode like we recommend above. **No symlinking required**, [we use Parcel's aliasing](https://github.com/palmerhq/tsdx/pull/88/files).
+### Making new requests
 
-To do a one-off build, use `npm run build` or `yarn build`.
+Call `requestDispatch` with options to make a new Algolia search request. Note
+this will **shallow merge** your previous request options. Making new requests
+will immediately reset `hits` to an empty array and set `loading` to true.
 
-To run tests, use `npm test` or `yarn test`.
+```ts
+requestDispatch({ query: 'something else' });
 
-## Configuration
+// Create a new request with query: 'something else' AND the filters below.
+requestDispatch({ filters: 'city:Sydney OR city:Melbourne' });
 
-Code quality is [set up for you](https://github.com/palmerhq/tsdx/pull/45/files) with `prettier`, `husky`, and `lint-staged`. Adjust the respective fields in `package.json` accordingly.
-
-### Jest
-
-Jest tests are set up to run with `npm test` or `yarn test`. This runs the test watcher (Jest) in an interactive mode. By default, runs tests related to files changed since the last commit.
-
-#### Setup Files
-
-This is the folder structure we set up for you:
-
-```shell
-/example
-  index.html
-  index.tsx       # test your component here in a demo app
-  package.json
-  tsconfig.json
-/src
-  index.tsx       # EDIT THIS
-/test
-  blah.test.tsx   # EDIT THIS
-.gitignore
-package.json
-README.md         # EDIT THIS
-tsconfig.json
+// Creates a new request, resetting query and filters. Same as retrieving all objects.
+requestDispatch({ query: '', filters: '' });
 ```
 
-#### React Testing Library
+### Loading more hits with pagination
 
-We do not set up `react-testing-library` for you yet, we welcome contributions and documentation on this.
+Call `getMore` to get the next page of hits. Get all hits from
+`searchState.hits`, not `searchState.response.hits`.
 
-### Rollup
+You could also manually pass in `page` to `requestDispatch` to get a specific
+page or skip pages. Calling `getMore` after doing so will still work.
 
-TSDX uses [Rollup v1.x](https://rollupjs.org) as a bundler and generates multiple rollup configs for various module formats and build settings. See [Optimizations](#optimizations) for details.
+### Increasing number of hits per page
 
-### TypeScript
+Include `hitsPerPage` in your request. Initially set to
+[Algolia’s default of 20](https://www.algolia.com/doc/api-reference/api-parameters/hitsPerPage/).
 
-`tsconfig.json` is set up to interpret `dom` and `esnext` types, as well as `react` for `jsx`. Adjust according to your needs.
+```ts
+const [searchState, requestDispatch, getMore] = useAlgolia(
+  APP_ID,
+  SEARCH_KEY,
+  INDEX_NAME,
+  { hitsPerPage: 100 }
+);
 
-## Continuous Integration
-
-### Travis
-
-_to be completed_
-
-### Circle
-
-_to be completed_
-
-## Optimizations
-
-Please see the main `tsdx` [optimizations docs](https://github.com/palmerhq/tsdx#optimizations). In particular, know that you can take advantage of development-only optimizations:
-
-```js
-// ./types/index.d.ts
-declare var __DEV__: boolean;
-
-// inside your code...
-if (__DEV__) {
-  console.log('foo');
-}
+// OR after initial query:
+requestDispatch({ hitsPerPage: 100 });
 ```
 
-You can also choose to install and use [invariant](https://github.com/palmerhq/tsdx#invariant) and [warning](https://github.com/palmerhq/tsdx#warning) functions.
+### Specifying hit type
 
-## Module Formats
+If you’re using TypeScript, pass the hit type as a generic type parameter. Hits
+will have `objectID`.
 
-CJS, ESModules, and UMD module formats are supported.
+```ts
+type Hit = {
+  title: string;
+  year: number;
+  actors: string[];
+};
 
-The appropriate paths are configured in `package.json` and `dist/index.js` accordingly. Please report if any issues are found.
+const [searchState, requestDispatch, getMore] = useAlgolia<Hit>(
+  APP_ID,
+  SEARCH_KEY,
+  INDEX_NAME
+);
 
-## Using the Playground
-
-```bash
-cd example
-npm i # or yarn to install dependencies
-npm start # or yarn start
+// hits will have type readonly (Hit & ObjectWithObjectID)[]
+const { hits } = searchState;
 ```
 
-The default example imports and live reloads whatever is in `/dist`, so if you are seeing an out of date component, make sure TSDX is running in watch mode like we recommend above. **No symlinking required**!
+## State
 
-## Deploying the Playground
+| Key          | Type                           | Description                                                                                                                                                     |
+| ------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **hits**     | `(Hit & ObjectWithObjectID)[]` | Contains all hits for search query, including all pages retrieved.                                                                                              |
+| **response** | `SearchResponse`               | Response to last query. Contains only last page of hits retrieved. Initially `null`. See https://www.algolia.com/doc/api-reference/api-methods/search/#response |
+| **loading**  | `boolean`                      | True if a request is being loaded, either to load initial request or when loading more hits.                                                                    |
+| **hasMore**  | `boolean`                      | True if there are more pages to be retrieved.                                                                                                                   |
 
-The Playground is just a simple [Parcel](https://parceljs.org) app, you can deploy it anywhere you would normally deploy that. Here are some guidelines for **manually** deploying with the Netlify CLI (`npm i -g netlify-cli`):
+---
 
-```bash
-cd example # if not already in the example folder
-npm run build # builds to dist
-netlify deploy # deploy the dist folder
-```
+## Credits
 
-Alternatively, if you already have a git repo connected, you can set up continuous deployment with Netlify:
+Based on the original hook by [@shamsmosowi](https://github.com/shamsmosowi).
 
-```bash
-netlify init
-# build command: yarn build && cd example && yarn && yarn build
-# directory to deploy: example/dist
-# pick yes for netlify.toml
-```
+Bootstrapped with [tsdx](https://github.com/jaredpalmer/tsdx) and published with
+[np](https://github.com/sindresorhus/np).
 
-## Named Exports
+## About Antler Engineering
 
-Per Palmer Group guidelines, [always use named exports.](https://github.com/palmerhq/typescript#exports) Code split inside your React app instead of your React library.
+useAlgolia is created by [Antler Engineering](https://twitter.com/AntlerEng).
 
-## Including Styles
+At [Antler](https://antler.co), we identify and invest in exceptional people.
 
-There are many ways to ship styles, including with CSS-in-JS. TSDX has no opinion on this, configure how you like.
+We’re a global startup generator and early-stage VC firm that builds
+groundbreaking technology companies.
 
-For vanilla CSS, you can include it at the root directory and add it to the `files` section in your `package.json`, so that it can be imported separately by your users and run through their bundler's loader.
-
-## Publishing to NPM
-
-We recommend using [np](https://github.com/sindresorhus/np).
-
-## Usage with Lerna
-
-When creating a new package with TSDX within a project set up with Lerna, you might encounter a `Cannot resolve dependency` error when trying to run the `example` project. To fix that you will need to make changes to the `package.json` file _inside the `example` directory_.
-
-The problem is that due to the nature of how dependencies are installed in Lerna projects, the aliases in the example project's `package.json` might not point to the right place, as those dependencies might have been installed in the root of your Lerna project.
-
-Change the `alias` to point to where those packages are actually installed. This depends on the directory structure of your Lerna project, so the actual path might be different from the diff below.
-
-```diff
-   "alias": {
--    "react": "../node_modules/react",
--    "react-dom": "../node_modules/react-dom"
-+    "react": "../../../node_modules/react",
-+    "react-dom": "../../../node_modules/react-dom"
-   },
-```
-
-An alternative to fixing this problem would be to remove aliases altogether and define the dependencies referenced as aliases as dev dependencies instead. [However, that might cause other problems.](https://github.com/palmerhq/tsdx/issues/64)
+[Apply now](https://antler.co/apply) to be part of a global cohort of tech
+founders.
