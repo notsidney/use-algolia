@@ -69,7 +69,7 @@ const searchReducer = (
  *      https://www.algolia.com/doc/api-reference/search-api-parameters/, and
  *   3. `getMore` to get the next page of results
  */
-export default function useAlgolia(
+export function useAlgolia(
   appId: string,
   searchKey: string,
   indexName: string,
@@ -135,3 +135,5 @@ export default function useAlgolia(
     typeof getMore
   ];
 }
+
+export default useAlgolia;
