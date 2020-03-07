@@ -1,4 +1,4 @@
-# useAlgolia [![npm latest release](https://badgen.net/npm/v/use-algolia)](https://www.npmjs.com/use-algolia) ![Minified size](https://badgen.net/bundlephobia/min/use-algolia)
+# useAlgolia [![npm latest release](https://badgen.net/npm/v/use-algolia)](https://www.npmjs.com/use-algolia) [![Minified size](https://badgen.net/bundlephobia/min/use-algolia)](https://bundlephobia.com/result?p=use-algolia)
 
 Dead-simple React hook to make Algolia search queries. Supports pagination out
 of the box.
