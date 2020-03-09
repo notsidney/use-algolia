@@ -3,6 +3,8 @@
 Dead-simple React hook to make Algolia search queries. Supports pagination out
 of the box.
 
+![Code snippet](assets/carbon.svg)
+
 ## Installation
 
 Requires [React](https://www.npmjs.com/react) >= 16.8.0 and
@@ -27,7 +29,7 @@ const [searchState, requestDispatch, getMore] = useAlgolia(
   APP_ID,
   SEARCH_KEY,
   INDEX_NAME,
-  { query: 'something' }
+  { query: 'construction' }
 );
 
 const { hits, response, loading, hasMore } = searchState;
@@ -40,9 +42,9 @@ this will **shallow merge** your previous request options. Making new requests
 will immediately reset `hits` to an empty array and set `loading` to true.
 
 ```ts
-requestDispatch({ query: 'something else' });
+requestDispatch({ query: 'bin chicken' });
 
-// Create a new request with query: 'something else' AND the filters below.
+// Create a new request with query: 'bin chicken' AND the filters below.
 requestDispatch({ filters: 'city:Sydney OR city:Melbourne' });
 
 // Creates a new request, resetting query and filters. Same as retrieving all objects.
@@ -76,8 +78,8 @@ requestDispatch({ hitsPerPage: 100 });
 
 ### Specifying hit type
 
-If you’re using TypeScript, pass the hit type as a generic type parameter. Hits
-will have `objectID`.
+If you’re using TypeScript, pass the hit type as the generic type parameter.
+Hits will have `objectID`.
 
 ```ts
 type Hit = {
@@ -114,9 +116,15 @@ Based on the original hook by [@shamsmosowi](https://github.com/shamsmosowi).
 Bootstrapped with [tsdx](https://github.com/jaredpalmer/tsdx) and published with
 [np](https://github.com/sindresorhus/np).
 
-## About Antler Engineering
-
 useAlgolia is created by [Antler Engineering](https://twitter.com/AntlerEng).
+
+[![Firetable](assets/firetable.svg)](https://firetable.io)
+
+Also check out our open-source project [Firetable](https://firetable.io): an
+accessible and powerful content management experience for Google Cloud with a
+spreadsheet-like UI for Firestore.
+
+## About Antler
 
 At [Antler](https://antler.co), we identify and invest in exceptional people.
 

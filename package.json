@@ -1,8 +1,16 @@
 {
+  "name": "use-algolia",
   "version": "0.1.3",
   "license": "MIT",
+  "author": "Sidney Alcantara",
+  "homepage": "https://github.com/AntlerVC/use-algolia#readme",
+  "repository": "github:AntlerVC/use-algolia",
+  "bugs": {
+    "url": "https://github.com/AntlerVC/use-algolia/issues"
+  },
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
+  "module": "dist/use-algolia.esm.js",
   "files": [
     "dist"
   ],
@@ -29,9 +37,6 @@
     "trailingComma": "es5",
     "proseWrap": "always"
   },
-  "name": "use-algolia",
-  "author": "Sidney Alcantara",
-  "module": "dist/use-algolia.esm.js",
   "devDependencies": {
     "@types/jest": "^25.1.4",
     "@types/react": "^16.9.23",
