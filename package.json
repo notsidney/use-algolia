@@ -1,5 +1,14 @@
 {
   "name": "use-algolia",
+  "description": "Dead-simple React hook to make Algolia search queries. Supports pagination out of the box.",
+  "keywords": [
+    "react",
+    "react-hook",
+    "react-hooks",
+    "algolia",
+    "algoliasearch",
+    "algolia-search"
+  ],
   "version": "1.0.0",
   "license": "MIT",
   "author": "Sidney Alcantara",
