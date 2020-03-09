@@ -3,7 +3,7 @@
 Dead-simple React hook to make Algolia search queries. Supports pagination out
 of the box.
 
-![Code snippet](assets/carbon.svg)
+![Code snippet](https://raw.githubusercontent.com/AntlerVC/use-algolia/master/assets/carbon.png)
 
 ## Installation
 
@@ -118,7 +118,7 @@ Bootstrapped with [tsdx](https://github.com/jaredpalmer/tsdx) and published with
 
 useAlgolia is created by [Antler Engineering](https://twitter.com/AntlerEng).
 
-[![Firetable](assets/firetable.svg)](https://firetable.io)
+[![Firetable](https://github.com/AntlerVC/use-algolia/raw/master/assets/firetable.svg?sanitize=true)](https://firetable.io)
 
 Also check out our open-source project [Firetable](https://firetable.io): an
 accessible and powerful content management experience for Google Cloud with a
