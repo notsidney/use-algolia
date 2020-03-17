@@ -25,6 +25,12 @@ interface SearchState<Hit> {
   loading: boolean;
   /** Flag set if there are more pages to be retrieved */
   hasMore: boolean;
+  /** Algolia App ID */
+  appId: string;
+  /** API key to search the index */
+  searchKey: string;
+  /** Algolia index to query */
+  indexName: string;
 }
 
 /**
@@ -68,6 +74,7 @@ const generateSearchReducer = <Hit>() => (
  *   2. `requestDispatch` to update `SearchOptions` passed to Algolia — see
  *      https://www.algolia.com/doc/api-reference/search-api-parameters/, and
  *   3. `getMore` to get the next page of results
+ *   4. `setAlgoliaConfig` to update the Algolia index to use
  */
 export function useAlgolia<Hit = any>(
   appId: string,
@@ -78,7 +85,15 @@ export function useAlgolia<Hit = any>(
   // Stores response status
   const [searchState, searchDispatch] = useReducer(
     generateSearchReducer<Hit>(),
-    { response: null, hits: [], loading: false, hasMore: false }
+    {
+      response: null,
+      hits: [],
+      loading: false,
+      hasMore: false,
+      appId,
+      searchKey,
+      indexName,
+    }
   );
 
   // Store the `SearchOptions` request object that can shallow-merge updates
@@ -91,16 +106,20 @@ export function useAlgolia<Hit = any>(
   );
 
   // Get Algolia index — only created for each `appId`, `indexName`, and `searchKey`
-  const index = useMemo(() => createAlgoliaIndex(appId, searchKey, indexName), [
-    appId,
-    searchKey,
-    indexName,
-  ]);
+  const index = useMemo(() => {
+    const { appId, searchKey, indexName } = searchState;
+    if (appId && searchKey && indexName)
+      return createAlgoliaIndex(appId, searchKey, indexName);
+
+    return null;
+  }, [searchState.appId, searchState.searchKey, searchState.indexName]);
 
   // Query algolia with search text + filters
   // Function will be recreated when `SearchOptions` request object changes
   const query = useCallback(
     async (page = 0) => {
+      if (!index) return;
+
       if (page > 0) searchDispatch({ loading: true });
       // If we’re not getting a new page, reset the hits
       else searchDispatch({ loading: true, hits: [] });
@@ -127,10 +146,25 @@ export function useAlgolia<Hit = any>(
       query(searchState.response.page + 1);
   };
 
-  return [searchState, requestDispatch, getMore] as [
+  const setAlgoliaConfig = (
+    newConfig: Partial<
+      Pick<SearchState<Hit>, 'appId' | 'searchKey' | 'indexName'>
+    >
+  ) => {
+    const updates: typeof newConfig = {};
+    // Only pass updated config items that are not undefined
+    if (newConfig.appId) updates.appId = newConfig.appId;
+    if (newConfig.searchKey) updates.searchKey = newConfig.searchKey;
+    if (newConfig.indexName) updates.indexName = newConfig.indexName;
+
+    searchDispatch(updates);
+  };
+
+  return [searchState, requestDispatch, getMore, setAlgoliaConfig] as [
     typeof searchState,
     typeof requestDispatch,
-    typeof getMore
+    typeof getMore,
+    typeof setAlgoliaConfig
   ];
 }
 

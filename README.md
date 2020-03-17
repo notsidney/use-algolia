@@ -18,6 +18,10 @@ yarn add react algoliasearch use-algolia
 
 Pass the Algolia app ID, search API key, and index name to the hook call.
 
+If you don’t have one of the three on the first hook call, pass in an empty
+string and use `setAlgoliaConfig`.
+[See the example below.](#changing-query-index-or-other-algolia-config)
+
 Optionally, pass the initial request options as the fourth argument.  
 See https://www.algolia.com/doc/api-reference/search-api-parameters/ for all
 options.
@@ -98,14 +102,35 @@ const [searchState, requestDispatch, getMore] = useAlgolia<Hit>(
 const { hits } = searchState;
 ```
 
+### Changing query index or other Algolia config
+
+You can change the `appId`, `searchKey`, or `indexName` using
+`setAlgoliaConfig`, the fourth function returned by the hook:
+
+```ts
+const [, , , setAlgoliaConfig] = useAlgolia<Hit>('', '', '');
+
+setAlgoliaConfig({
+  appId: APP_ID,
+  searchKey: SEARCH_KEY,
+  indexName: INDEX_NAME,
+});
+```
+
+This will automatically do the first query on the new index if all three items
+are provided.
+
 ## State
 
-| Key          | Type                           | Description                                                                                                                                                     |
-| ------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **hits**     | `(Hit & ObjectWithObjectID)[]` | Contains all hits for search query, including all pages retrieved.                                                                                              |
-| **response** | `SearchResponse`               | Response to last query. Contains only last page of hits retrieved. Initially `null`. See https://www.algolia.com/doc/api-reference/api-methods/search/#response |
-| **loading**  | `boolean`                      | True if a request is being loaded, either to load initial request or when loading more hits.                                                                    |
-| **hasMore**  | `boolean`                      | True if there are more pages to be retrieved.                                                                                                                   |
+| Key           | Type                           | Description                                                                                                                                                     |
+| ------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **hits**      | `(Hit & ObjectWithObjectID)[]` | Contains all hits for search query, including all pages retrieved.                                                                                              |
+| **response**  | `SearchResponse`               | Response to last query. Contains only last page of hits retrieved. Initially `null`. See https://www.algolia.com/doc/api-reference/api-methods/search/#response |
+| **loading**   | `boolean`                      | True if a request is being loaded, either to load initial request or when loading more hits.                                                                    |
+| **hasMore**   | `boolean`                      | True if there are more pages to be retrieved.                                                                                                                   |
+| **appId**     | `string`                       | Algolia App ID.                                                                                                                                                 |
+| **searchKey** | `string`                       | API key to search the index.                                                                                                                                    |
+| **indexName** | `string`                       | Algolia index to query.                                                                                                                                         |
 
 ---
 
