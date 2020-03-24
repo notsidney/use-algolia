@@ -149,6 +149,7 @@ if (index) index.searchForFacetValues('city');
 | **searchKey** | `string`                       | API key to search the index.                                                                                                                                                                                                                                                       |
 | **indexName** | `string`                       | Algolia index to query.                                                                                                                                                                                                                                                            |
 | **index**     | `SearchIndex` or `null`        | Exposed Algolia search index. Note we use the lite client, which only supports the [`search`](https://www.algolia.com/doc/api-reference/api-methods/search/) and [`searchForFacetValues`](https://www.algolia.com/doc/api-reference/api-methods/search-for-facet-values/) methods. |
+| **request**   | `SearchOptions`                | Exposed search request options passed to the last request. [From previous `requestDispatch` calls.](#making-new-requests)                                                                                                                                                          |
 
 ---
 
