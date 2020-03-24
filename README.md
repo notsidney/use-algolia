@@ -108,7 +108,7 @@ You can change the `appId`, `searchKey`, or `indexName` using
 `setAlgoliaConfig`, the fourth function returned by the hook:
 
 ```ts
-const [, , , setAlgoliaConfig] = useAlgolia<Hit>('', '', '');
+const [, , , setAlgoliaConfig] = useAlgolia('', '', '');
 
 setAlgoliaConfig({
   appId: APP_ID,
@@ -120,17 +120,35 @@ setAlgoliaConfig({
 This will automatically do the first query on the new index if all three items
 are provided.
 
+### Searching for facet values
+
+You can access the search index created by the hook in `searchState` to call the
+`searchForFacetValues` method. See
+https://www.algolia.com/doc/api-reference/api-methods/search-for-facet-values/
+
+Note: `index` may be `null` if one of `appId`, `searchKey`, or `indexName` is
+missing or invalid in `searchState`.
+[See Changing query index or other Algolia config above.](#changing-query-index-or-other-algolia-config)
+
+```js
+const [searchState] = useAlgolia('', '', '');
+const { index } = searchState;
+
+if (index) index.searchForFacetValues('city');
+```
+
 ## State
 
-| Key           | Type                           | Description                                                                                                                                                     |
-| ------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **hits**      | `(Hit & ObjectWithObjectID)[]` | Contains all hits for search query, including all pages retrieved.                                                                                              |
-| **response**  | `SearchResponse`               | Response to last query. Contains only last page of hits retrieved. Initially `null`. See https://www.algolia.com/doc/api-reference/api-methods/search/#response |
-| **loading**   | `boolean`                      | True if a request is being loaded, either to load initial request or when loading more hits.                                                                    |
-| **hasMore**   | `boolean`                      | True if there are more pages to be retrieved.                                                                                                                   |
-| **appId**     | `string`                       | Algolia App ID.                                                                                                                                                 |
-| **searchKey** | `string`                       | API key to search the index.                                                                                                                                    |
-| **indexName** | `string`                       | Algolia index to query.                                                                                                                                         |
+| Key           | Type                           | Description                                                                                                                                                                                                                                                                        |
+| ------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **hits**      | `(Hit & ObjectWithObjectID)[]` | Contains all hits for search query, including all pages retrieved.                                                                                                                                                                                                                 |
+| **response**  | `SearchResponse` or `null`     | Response to last query. Contains only last page of hits retrieved. Initially `null`. See https://www.algolia.com/doc/api-reference/api-methods/search/#response                                                                                                                    |
+| **loading**   | `boolean`                      | True if a request is being loaded, either to load initial request or when loading more hits.                                                                                                                                                                                       |
+| **hasMore**   | `boolean`                      | True if there are more pages to be retrieved.                                                                                                                                                                                                                                      |
+| **appId**     | `string`                       | Algolia App ID.                                                                                                                                                                                                                                                                    |
+| **searchKey** | `string`                       | API key to search the index.                                                                                                                                                                                                                                                       |
+| **indexName** | `string`                       | Algolia index to query.                                                                                                                                                                                                                                                            |
+| **index**     | `SearchIndex` or `null`        | Exposed Algolia search index. Note we use the lite client, which only supports the [`search`](https://www.algolia.com/doc/api-reference/api-methods/search/) and [`searchForFacetValues`](https://www.algolia.com/doc/api-reference/api-methods/search-for-facet-values/) methods. |
 
 ---
 

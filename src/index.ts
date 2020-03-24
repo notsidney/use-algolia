@@ -1,5 +1,5 @@
-import { useReducer, useMemo, useCallback, useEffect } from 'react';
-import algoliasearch from 'algoliasearch/lite';
+import { useReducer, useCallback, useEffect } from 'react';
+import algoliasearch, { SearchIndex } from 'algoliasearch';
 import { RequestOptions } from '@algolia/transporter';
 import { SearchOptions, SearchResponse } from '@algolia/client-search';
 
@@ -10,10 +10,13 @@ import { SearchOptions, SearchResponse } from '@algolia/client-search';
  * @param indexName Index to initialise
  */
 export const createAlgoliaIndex = (
-  appId: string,
-  searchKey: string,
-  indexName: string
-) => algoliasearch(appId, searchKey).initIndex(indexName);
+  appId?: string,
+  searchKey?: string,
+  indexName?: string
+) => {
+  if (!appId || !searchKey || !indexName) return null;
+  return algoliasearch(appId, searchKey).initIndex(indexName);
+};
 
 /** Current request state, hits retrieved, and loading status. */
 interface SearchState<Hit> {
@@ -31,6 +34,8 @@ interface SearchState<Hit> {
   searchKey: string;
   /** Algolia index to query */
   indexName: string;
+  /** The Algolia search index created */
+  index: SearchIndex | null;
 }
 
 /**
@@ -93,8 +98,10 @@ export function useAlgolia<Hit = any>(
       appId,
       searchKey,
       indexName,
+      index: createAlgoliaIndex(appId, searchKey, indexName),
     }
   );
+  const { index } = searchState;
 
   // Store the `SearchOptions` request object that can shallow-merge updates
   const [request, requestDispatch] = useReducer(
@@ -104,15 +111,6 @@ export function useAlgolia<Hit = any>(
     ) => ({ ...prev, ...updates }),
     initialRequest
   );
-
-  // Get Algolia index — only created for each `appId`, `indexName`, and `searchKey`
-  const index = useMemo(() => {
-    const { appId, searchKey, indexName } = searchState;
-    if (appId && searchKey && indexName)
-      return createAlgoliaIndex(appId, searchKey, indexName);
-
-    return null;
-  }, [searchState.appId, searchState.searchKey, searchState.indexName]);
 
   // Query algolia with search text + filters
   // Function will be recreated when `SearchOptions` request object changes
@@ -146,16 +144,24 @@ export function useAlgolia<Hit = any>(
       query(searchState.response.page + 1);
   };
 
+  // Updates Algolia config and creates a new index, then updates state
   const setAlgoliaConfig = (
     newConfig: Partial<
       Pick<SearchState<Hit>, 'appId' | 'searchKey' | 'indexName'>
     >
   ) => {
-    const updates: typeof newConfig = {};
+    const updates: Partial<SearchState<Hit>> = {};
     // Only pass updated config items that are not undefined
     if (newConfig.appId) updates.appId = newConfig.appId;
     if (newConfig.searchKey) updates.searchKey = newConfig.searchKey;
     if (newConfig.indexName) updates.indexName = newConfig.indexName;
+
+    // Generate new index with latest data
+    updates.index = createAlgoliaIndex(
+      updates.appId ?? searchState.appId,
+      updates.searchKey ?? searchState.searchKey,
+      updates.indexName ?? searchState.indexName
+    );
 
     searchDispatch(updates);
   };
