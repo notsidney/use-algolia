@@ -1,7 +1,7 @@
-import { useReducer, useCallback, useEffect } from 'react'
-import algoliasearch, { SearchIndex } from 'algoliasearch'
-import { RequestOptions } from '@algolia/transporter'
-import { SearchOptions, SearchResponse } from '@algolia/client-search'
+import { useReducer, useCallback, useEffect } from 'react';
+import algoliasearch, { SearchIndex } from 'algoliasearch';
+import { RequestOptions } from '@algolia/transporter';
+import { SearchOptions, SearchResponse } from '@algolia/client-search';
 
 /**
  * Creates the Algolia search client and initialises the specified index.
@@ -14,28 +14,28 @@ export const createAlgoliaIndex = (
   searchKey?: string,
   indexName?: string
 ) => {
-  if (!appId || !searchKey || !indexName) return null
-  return algoliasearch(appId, searchKey).initIndex(indexName)
-}
+  if (!appId || !searchKey || !indexName) return null;
+  return algoliasearch(appId, searchKey).initIndex(indexName);
+};
 
 /** Current request state, hits retrieved, and loading status. */
 interface SearchState<Hit> {
   /** Algolia SearchResponse object — contains only last page of hits retrieved */
-  response: SearchResponse<Hit> | null
+  response: SearchResponse<Hit> | null;
   /** Contains all hits for search query, including all pages retrieved */
-  hits: SearchResponse<Hit>['hits']
+  hits: SearchResponse<Hit>['hits'];
   /** Set when loading initially or loading more hits */
-  loading: boolean
+  loading: boolean;
   /** Flag set if there are more pages to be retrieved */
-  hasMore: boolean
+  hasMore: boolean;
   /** Algolia App ID */
-  appId: string
+  appId: string;
   /** API key to search the index */
-  searchKey: string
+  searchKey: string;
   /** Algolia index to query */
-  indexName: string
+  indexName: string;
   /** The Algolia search index created */
-  index: SearchIndex | null
+  index: SearchIndex | null;
 }
 
 /**
@@ -49,7 +49,7 @@ const generateSearchReducer = <Hit>() => (
   prevState: SearchState<Hit>,
   updates: Partial<SearchState<Hit>>
 ): SearchState<Hit> => {
-  const gotMore = updates?.response?.page && updates?.response?.page > 0
+  const gotMore = updates?.response?.page && updates?.response?.page > 0;
 
   const hits =
     gotMore && updates.response
@@ -59,14 +59,14 @@ const generateSearchReducer = <Hit>() => (
         // 2. use the latest `hits` from the response,
         // 3. use `hits` from the previous state, or
         // 4. an empty array
-        updates.hits ?? updates.response?.hits ?? prevState.hits ?? []
+        updates.hits ?? updates.response?.hits ?? prevState.hits ?? [];
 
   const hasMore = updates.response
     ? updates.response.page < updates.response.nbPages - 1
-    : false
+    : false;
 
-  return { ...prevState, ...updates, hits, hasMore }
-}
+  return { ...prevState, ...updates, hits, hasMore };
+};
 
 /**
  * Hook to make Algolia search queries with built-in support for pagination.
@@ -100,8 +100,8 @@ export function useAlgolia<Hit = any>(
       indexName,
       index: createAlgoliaIndex(appId, searchKey, indexName),
     }
-  )
-  const { index } = searchState
+  );
+  const { index } = searchState;
 
   // Store the `SearchOptions` request object that can shallow-merge updates
   const [request, requestDispatch] = useReducer(
@@ -110,43 +110,44 @@ export function useAlgolia<Hit = any>(
       updates: RequestOptions & SearchOptions
     ) => ({ ...prev, ...updates }),
     initialRequest
-  )
+  );
 
   // Query algolia with search text + filters
   // Function will be recreated when `SearchOptions` request object changes
   const query = useCallback(
     async (page?: number) => {
-      if (!index) return
+      if (!index) return;
 
       // Set loading
       if (typeof page === 'number' && page > 0)
-        searchDispatch({ loading: true })
+        searchDispatch({ loading: true });
       // If we’re not getting a new page, reset the hits
-      else searchDispatch({ loading: true, hits: [] })
+      else searchDispatch({ loading: true, hits: [] });
 
+      console.log(page);
       const response = await index.search<Hit>('', {
         ...request,
         // Allow getMore() to work even if the user
         // has set page in requestDispatch
-        page,
-      })
+        page: page ?? request.page ?? 0,
+      });
 
-      searchDispatch({ response, loading: false })
+      searchDispatch({ response, loading: false });
     },
     [index, request]
-  )
+  );
 
   // Get completely new query when `query` function is recreated above
   useEffect(() => {
-    query()
-  }, [query])
+    query();
+  }, [query]);
 
   // Get more by incrementing the page. Does nothing if we’re still waiting
   // on new results to arrive or if there are no more pages to be loaded
   const getMore = () => {
     if (searchState.response && !searchState.loading && searchState.hasMore)
-      query(searchState.response.page + 1)
-  }
+      query(searchState.response.page + 1);
+  };
 
   // Updates Algolia config and creates a new index, then updates state
   const setAlgoliaConfig = (
@@ -154,21 +155,21 @@ export function useAlgolia<Hit = any>(
       Pick<SearchState<Hit>, 'appId' | 'searchKey' | 'indexName'>
     >
   ) => {
-    const updates: Partial<SearchState<Hit>> = {}
+    const updates: Partial<SearchState<Hit>> = {};
     // Only pass updated config items that are not undefined
-    if (newConfig.appId) updates.appId = newConfig.appId
-    if (newConfig.searchKey) updates.searchKey = newConfig.searchKey
-    if (newConfig.indexName) updates.indexName = newConfig.indexName
+    if (newConfig.appId) updates.appId = newConfig.appId;
+    if (newConfig.searchKey) updates.searchKey = newConfig.searchKey;
+    if (newConfig.indexName) updates.indexName = newConfig.indexName;
 
     // Generate new index with latest data
     updates.index = createAlgoliaIndex(
       updates.appId ?? searchState.appId,
       updates.searchKey ?? searchState.searchKey,
       updates.indexName ?? searchState.indexName
-    )
+    );
 
-    searchDispatch(updates)
-  }
+    searchDispatch(updates);
+  };
 
   return [
     { ...searchState, request },
@@ -180,7 +181,7 @@ export function useAlgolia<Hit = any>(
     typeof requestDispatch,
     typeof getMore,
     typeof setAlgoliaConfig
-  ]
+  ];
 }
 
-export default useAlgolia
+export default useAlgolia;
