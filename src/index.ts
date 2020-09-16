@@ -124,7 +124,6 @@ export function useAlgolia<Hit = any>(
       // If we’re not getting a new page, reset the hits
       else searchDispatch({ loading: true, hits: [] });
 
-      console.log(page);
       const response = await index.search<Hit>('', {
         ...request,
         // Allow getMore() to work even if the user
