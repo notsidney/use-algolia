@@ -19,7 +19,7 @@ yarn add react algoliasearch use-algolia
 Pass the Algolia app ID, search API key, and index name to the hook call.
 
 If you don’t have one of the three on the first hook call, pass in an empty
-string and use `setAlgoliaConfig`.
+string first.
 [See the example below.](#changing-query-index-or-other-algolia-config)
 
 Optionally, pass the initial request options as the fourth argument.  
@@ -104,8 +104,10 @@ const { hits } = searchState;
 
 ### Changing query index or other Algolia config
 
-You can change the `appId`, `searchKey`, or `indexName` using
-`setAlgoliaConfig`, the fourth function returned by the hook:
+When the `appId`, `searchKey`, or `indexName` passed to the hook call updates,
+the index is reinitialised with the new config.
+
+You can also use the `setAlgoliaConfig` function returned by the hook:
 
 ```ts
 const [, , , setAlgoliaConfig] = useAlgolia('', '', '');
@@ -117,8 +119,8 @@ setAlgoliaConfig({
 });
 ```
 
-This will automatically do the first query on the new index if all three items
-are provided.
+Doing either will automatically do the first query on the new index if all three
+items are provided.
 
 ### Searching for facet values
 
