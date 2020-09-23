@@ -169,6 +169,10 @@ export function useAlgolia<Hit = any>(
 
     searchDispatch(updates);
   };
+  // Update config when main useAlgolia props update
+  useEffect(() => {
+    setAlgoliaConfig({ appId, searchKey, indexName });
+  }, [appId, searchKey, indexName]);
 
   return [
     { ...searchState, request },
