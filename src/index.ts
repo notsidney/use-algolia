@@ -179,11 +179,13 @@ export function useAlgolia<Hit = any>(
     requestDispatch,
     getMore,
     setAlgoliaConfig,
+    query,
   ] as [
     typeof searchState & { request: typeof request },
     typeof requestDispatch,
     typeof getMore,
-    typeof setAlgoliaConfig
+    typeof setAlgoliaConfig,
+    typeof query
   ];
 }
 
