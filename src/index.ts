@@ -149,26 +149,29 @@ export function useAlgolia<Hit = any>(
   };
 
   // Updates Algolia config and creates a new index, then updates state
-  const setAlgoliaConfig = (
-    newConfig: Partial<
-      Pick<SearchState<Hit>, 'appId' | 'searchKey' | 'indexName'>
-    >
-  ) => {
-    const updates: Partial<SearchState<Hit>> = {};
-    // Only pass updated config items that are not undefined
-    if (newConfig.appId) updates.appId = newConfig.appId;
-    if (newConfig.searchKey) updates.searchKey = newConfig.searchKey;
-    if (newConfig.indexName) updates.indexName = newConfig.indexName;
+  const setAlgoliaConfig = useCallback(
+    (
+      newConfig: Partial<
+        Pick<SearchState<Hit>, 'appId' | 'searchKey' | 'indexName'>
+      >
+    ) => {
+      const updates: Partial<SearchState<Hit>> = {};
+      // Only pass updated config items that are not undefined
+      if (newConfig.appId) updates.appId = newConfig.appId;
+      if (newConfig.searchKey) updates.searchKey = newConfig.searchKey;
+      if (newConfig.indexName) updates.indexName = newConfig.indexName;
 
-    // Generate new index with latest data
-    updates.index = createAlgoliaIndex(
-      updates.appId ?? searchState.appId,
-      updates.searchKey ?? searchState.searchKey,
-      updates.indexName ?? searchState.indexName
-    );
+      // Generate new index with latest data
+      updates.index = createAlgoliaIndex(
+        updates.appId ?? searchState.appId,
+        updates.searchKey ?? searchState.searchKey,
+        updates.indexName ?? searchState.indexName
+      );
 
-    searchDispatch(updates);
-  };
+      searchDispatch(updates);
+    },
+    []
+  );
   // Update config when main useAlgolia props update
   useEffect(() => {
     setAlgoliaConfig({ appId, searchKey, indexName });
