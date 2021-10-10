@@ -12,10 +12,10 @@
   "version": "1.5.2",
   "license": "MIT",
   "author": "Sidney Alcantara",
-  "homepage": "https://github.com/AntlerVC/use-algolia#readme",
-  "repository": "github:AntlerVC/use-algolia",
+  "homepage": "https://github.com/notsidney/use-algolia#readme",
+  "repository": "github:notsidney/use-algolia",
   "bugs": {
-    "url": "https://github.com/AntlerVC/use-algolia/issues"
+    "url": "https://github.com/notsidney/use-algolia/issues"
   },
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
