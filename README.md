@@ -161,21 +161,3 @@ Based on the original hook by [@shamsmosowi](https://github.com/shamsmosowi).
 
 Bootstrapped with [tsdx](https://github.com/jaredpalmer/tsdx) and published with
 [np](https://github.com/sindresorhus/np).
-
-useAlgolia is created by [Antler Engineering](https://twitter.com/AntlerEng).
-
-[![Firetable](https://github.com/AntlerVC/use-algolia/raw/master/assets/firetable.svg?sanitize=true)](https://firetable.io)
-
-Also check out our open-source project [Firetable](https://firetable.io): an
-accessible and powerful content management experience for Google Cloud with a
-spreadsheet-like UI for Firestore.
-
-## About Antler
-
-At [Antler](https://antler.co), we identify and invest in exceptional people.
-
-We’re a global startup generator and early-stage VC firm that builds
-groundbreaking technology companies.
-
-[Apply now](https://antler.co/apply) to be part of a global cohort of tech
-founders.
