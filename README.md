@@ -3,7 +3,7 @@
 Dead-simple React hook to make Algolia search queries. Supports pagination out
 of the box.
 
-![Code snippet](https://raw.githubusercontent.com/AntlerVC/use-algolia/master/assets/carbon.png)
+![Code snippet](https://raw.githubusercontent.com/notsidney/use-algolia/master/assets/carbon.png)
 
 ## Installation
 
