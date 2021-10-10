@@ -9,7 +9,7 @@
     "algoliasearch",
     "algolia-search"
   ],
-  "version": "1.5.1",
+  "version": "1.5.2",
   "license": "MIT",
   "author": "Sidney Alcantara",
   "homepage": "https://github.com/AntlerVC/use-algolia#readme",
